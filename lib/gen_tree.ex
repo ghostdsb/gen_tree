@@ -138,6 +138,30 @@ defmodule GenTree do
   """
   def insert_child(node_pid, data, child_type \\ :nil), do: GenTree.Node.insert_child(node_pid, data, child_type)
 
+  @doc """
+
+  Builds a Binary tree from a list of data
+
+  ## Examples
+
+      iex(85)> root = GenTree.build_tree([1,2,3,4,5])
+      #PID<0.398.0>
+      iex(86)> rl = GenTree.get_left(root)
+      #PID<0.399.0>
+      iex(87)> rlr = GenTree.get_right(rl)
+      #PID<0.402.0>
+      iex(88)> GenTree.get_node(rlr)
+      %GenTree.Node{children: [], data: 5, left: nil, right: nil}
+      iex(89)> GenTree.get_node(rl)
+      %GenTree.Node{
+        children: [#PID<0.402.0>, #PID<0.401.0>],
+        data: 2,
+        left: #PID<0.401.0>,
+        right: #PID<0.402.0>
+      }
+
+  """
+  def build_tree(data_list), do: GenTree.BinaryTree.build_tree_level_order(data_list)
 
 
 end

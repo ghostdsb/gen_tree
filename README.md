@@ -45,16 +45,16 @@ Tree data structure for BEAM in BEAM-way
 
 5. Inserting a child to parent in left, right or omitted for general n-ary
     ```elixir
-    iex(21)> root = GenTree.new("a")
+    iex> root = GenTree.new("a")
     #PID<0.228.0>
 
-    iex(22)> GenTree.get_node(root)
+    iex> GenTree.get_node(root)
     %GenTree.Node{children: [], data: "a", left: nil, right: nil}
 
-    iex(23)> left_child = GenTree.insert_child(root, "b", :left)
+    iex> left_child = GenTree.insert_child(root, "b", :left)
     #PID<0.231.0>
 
-    iex(24)> GenTree.get_node(root)
+    iex> GenTree.get_node(root)
     %GenTree.Node{
       children: [#PID<0.231.0>],
       data: "a",
@@ -64,4 +64,28 @@ Tree data structure for BEAM in BEAM-way
 
     iex(25)> GenTree.get_node(left_child)
     %GenTree.Node{children: [], data: "b", left: nil, right: nil}
+    ```
+
+6. Building a binary tree from input data list
+    ```elixir
+    iex> root = GenTree.build_tree([1,2,3,4,5])
+    #PID<0.398.0>
+    
+    iex> rl = GenTree.get_left(root)
+    #PID<0.399.0>
+    
+    iex> rlr = GenTree.get_right(rl)
+    #PID<0.402.0>
+    
+    iex> GenTree.get_node(rlr)
+    %GenTree.Node{children: [], data: 5, left: nil, right: nil}
+    
+    iex> GenTree.get_node(rl)
+    %GenTree.Node{
+      children: [#PID<0.402.0>, #PID<0.401.0>],
+      data: 2,
+      left: #PID<0.401.0>,
+      right: #PID<0.402.0>
+    }
+
     ```
