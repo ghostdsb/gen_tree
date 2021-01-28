@@ -1,4 +1,5 @@
 defmodule GenTree.Node do
+  @moduledoc false
 
   defstruct(
     data: nil,
@@ -10,6 +11,10 @@ defmodule GenTree.Node do
   def new(data) do
     {:ok, pid} = Agent.start(fn -> GenTree.Node.__struct__() |> Map.put(:data, data) end)
     pid
+  end
+
+  def get_data(pid) do
+    Agent.get(pid, fn state -> state.data end)
   end
 
   def get_node(pid) do

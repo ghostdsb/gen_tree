@@ -1,4 +1,5 @@
-defmodule GenTree.BinaryTree do
+defmodule GenTree.Builder do
+  @moduledoc false
 
   def build_tree_level_order(data_list)
 

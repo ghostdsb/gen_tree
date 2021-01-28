@@ -1,6 +1,6 @@
 # GenTree
 
-Tree data structure for BEAM in BEAM-way
+Tree data structure for BEAM in BEAM-way. Each node is a process that contains data and children_pids (just like using pointers).
 
 1. Start a new tree
     ```elixir
@@ -88,4 +88,26 @@ Tree data structure for BEAM in BEAM-way
       right: #PID<0.402.0>
     }
 
+    ```
+
+7. DFS tree traversal
+    ```elixir
+    iex> root = GenTree.build_tree([1,2,3,4,5,6])
+    #PID<0.378.0>
+    iex> GenTree.Traversal.dfs(root)
+    [4, 2, 5, 1, 6, 3]
+    iex> GenTree.Traversal.dfs(root, :preorder)
+    [1, 2, 4, 5, 3, 6]
+    iex> GenTree.Traversal.dfs(root, :postorder)
+    [4, 5, 2, 6, 3, 1]
+
+    ```
+
+8. BFS Tree Traversal
+    ```elixir
+    iex> root = GenTree.build_tree([1,2,3,4,5,6])
+    #PID<0.427.0>
+    iex> GenTree.Traversal.bfs(root)
+    [1, 2, 3, 4, 5, 6]
+    
     ```
