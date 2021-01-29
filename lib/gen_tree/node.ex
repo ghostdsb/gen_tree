@@ -9,57 +9,61 @@ defmodule GenTree.Node do
   )
 
   def new(data) do
-    {:ok, pid} = Agent.start(fn -> GenTree.Node.__struct__() |> Map.put(:data, data) end)
-    pid
+    {:ok, node_pid} = Agent.start(fn -> GenTree.Node.__struct__() |> Map.put(:data, data) end)
+    node_pid
   end
 
-  def get_data(pid) do
-    Agent.get(pid, fn state -> state.data end)
+  def get_data(node_pid) do
+    Agent.get(node_pid, fn state -> state.data end)
   end
 
-  def get_node(pid) do
-    Agent.get(pid, fn state -> state end)
+  def get_children(node_pid) do
+    Agent.get(node_pid, fn state -> state.children end)
   end
 
-  def get_left(pid) do
-    Agent.get(pid, fn state -> state.left end)
+  def count_children(node_pid) do
+    node_pid |> get_children() |> Enum.count()
   end
 
-  def get_right(pid) do
-    Agent.get(pid, fn state -> state.right end)
+  def get_node(node_pid) do
+    Agent.get(node_pid, fn state -> state end)
   end
 
-  def left?(pid) do
-    Agent.get(pid, fn state -> not is_nil(state.left)  end)
+  def get_left(node_pid) do
+    Agent.get(node_pid, fn state -> state.left end)
   end
 
-  def right?(pid) do
-    Agent.get(pid, fn state -> not is_nil(state.right) end)
+  def get_right(node_pid) do
+    Agent.get(node_pid, fn state -> state.right end)
   end
 
-  def get_children(pid) do
-    Agent.get(pid, fn state -> state.children end)
+  def has_left?(node_pid) do
+    Agent.get(node_pid, fn state -> not is_nil(state.left)  end)
   end
 
-  def update_data(pid, data) do
-    Agent.get(pid, fn state -> %{state | data: data} end)
+  def has_right?(node_pid) do
+    Agent.get(node_pid, fn state -> not is_nil(state.right) end)
   end
 
-  def update_node(pid, new_state) do
-    Agent.get(pid, fn _ -> new_state end)
+  def update_data(node_pid, data) do
+    Agent.get(node_pid, fn state -> %{state | data: data} end)
   end
 
-  def insert_child(parent_pid, data, child_type) do
-    child_pid = new(data)
+  def update_node(node_pid, new_state) do
+    Agent.get(node_pid, fn _ -> new_state end)
+  end
+
+  def insert_child(parent_node_pid, data, child_type) do
+    child_node_pid = new(data)
     case child_type do
       :left ->
-        Agent.update(parent_pid, fn state -> %{state | children: [child_pid | state.children], left: child_pid} end)
+        Agent.update(parent_node_pid, fn state -> %{state | children: [child_node_pid | state.children], left: child_node_pid} end)
       :right ->
-        Agent.update(parent_pid, fn state -> %{state | children: [child_pid | state.children], right: child_pid} end)
+        Agent.update(parent_node_pid, fn state -> %{state | children: [child_node_pid | state.children], right: child_node_pid} end)
       _ ->
-        Agent.update(parent_pid, fn state -> %{state | children: [child_pid | state.children]} end)
+        Agent.update(parent_node_pid, fn state -> %{state | children: [child_node_pid | state.children]} end)
     end
-    child_pid
+    child_node_pid
   end
 
 end

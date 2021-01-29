@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.0.1
+## v0.2.0
+
+* Renamed build_tree/2 to from_list/2
+* Added empty sub trees feature for from_list/2
+* Added count_children/1
+* Updated bfs traversal for nary tree
+
+## v0.1.0
 
 * create tree
 * build binary tree from datalist

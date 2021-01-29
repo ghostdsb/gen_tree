@@ -1,33 +1,42 @@
 defmodule GenTree.Builder do
   @moduledoc false
 
-  def build_tree_level_order(data_list)
+  def from_list(data_list, opts)
 
-  def build_tree_level_order([]), do: GenTree.new(:nil)
+  def from_list([], _opts), do: GenTree.new(:nil)
 
-  def build_tree_level_order([head_data| rest_data_list]) do
+  def from_list([head_data| rest_data], opts) do
     root = GenTree.new(head_data)
     q = :queue.new()
     q = :queue.in(root, q)
-    build_tree_level_order(rest_data_list, root, q)
+    nary = opts |> Keyword.get(:nary)
+
+    build(Enum.chunk_every(rest_data, nary), root, q, nary)
   end
 
-  def build_tree_level_order([], root, _queue), do: root
+  defp build([], root, _queue, _nary), do: root
 
-  def build_tree_level_order([head_data| rest_data], root, queue) do
-    queue_head = :queue.head(queue)
+  defp build([hd_children_chunk| rest_children_chunk], root, queue, nary) do
+    {{:value, parent_pid}, queue} = :queue.out(queue)
+    queue =
+      hd_children_chunk
+      |> Enum.with_index()
+      |> Enum.filter(fn {data, _index} -> not is_nil(data) end)
+      |> Enum.map(fn {data, index} -> insert_child(nary, rem(index, 2) === 0 , parent_pid, data) end)
+      |> Enum.reduce(queue, fn child_pid, queue -> :queue.in(child_pid, queue) end)
 
-    {child_node_pid, queue} =
-      cond do
-        not GenTree.left?(queue_head) ->
-          child_node = GenTree.insert_child(queue_head, head_data, :left)
-          {child_node, queue}
-        not GenTree.right?(queue_head) ->
-          child_node = GenTree.insert_child(queue_head, head_data, :right)
-          {child_node, :queue.tail(queue)}
-      end
+    build(rest_children_chunk, root, queue, nary)
+  end
 
-    build_tree_level_order(rest_data, root, :queue.in(child_node_pid, queue))
+  defp insert_child(nary, is_left, parent_pid, data)
+  defp insert_child(2, true, parent_pid, data) do
+    GenTree.insert_child(parent_pid, data, :left)
+  end
+  defp insert_child(2, false, parent_pid, data) do
+    GenTree.insert_child(parent_pid, data, :right)
+  end
+  defp insert_child(_nary, _is_left, parent_pid, data) do
+    GenTree.insert_child(parent_pid, data)
   end
 
 end

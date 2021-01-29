@@ -1,8 +1,25 @@
 defmodule GenTree do
-  @moduledoc """
-  Documentation for `GenTree`.
-  Tree data structure for BEAM in BEAM-way. Each node is a process that contains data and children_pids (just like using pointers).
-  """
+    @moduledoc """
+    Tree data structure for BEAM in BEAM-way. Each node is a process that contains data and children_pids. The pid is used as pointers.
+
+    Tree implementation becomes straight forwards with pointers that can point to a node and a shared state that helps in while performing operations on different nodes, say traversals.
+    A work around this would be using ```Agents```.
+
+        Agents are a simple abstraction around state.
+
+        Often in Elixir there is a need to share or store state that must be accessed
+        from different processes or by the same process at different points in time.
+
+        The Agent module provides a basic server implementation that allows state to be
+        retrieved and updated via a simple API.
+
+    Thus a node in tree can be described as
+
+    ```elixir
+    {:ok, node_pid} = Agent.start(fn -> %{data: "some_data"} end)
+    ```
+    This provides us with a pid which can be used to point to the node and a state that can be manipulated.
+    """
 
   @spec new(any) :: pid
   @doc """
@@ -19,7 +36,7 @@ defmodule GenTree do
 
   @spec get_node(pid) :: GenTree.Node.t
   @doc """
-  Get the node details %GenTree.Node{children: children_list, data: any(), left: pid()\\:nil, right: pid()\\nil}
+  Get the node details.
 
   ## Examples
 
@@ -32,7 +49,7 @@ defmodule GenTree do
 
   @spec get_data(pid) :: any
   @doc """
-  Get the node data value %GenTree.Node{children: children_list, data: any(), left: pid()\\:nil, right: pid()\\nil}
+  Get the node data value.
 
   ## Examples
 
@@ -45,49 +62,72 @@ defmodule GenTree do
 
   @spec get_left(pid) :: pid
   @doc """
-  Get the left child of node
+  Get the left child of node in case of binary tree [:nary, 2]
 
   ## Examples
       iex> root = GenTree.new(5)
-      iex> left_child = GenTree.get_left(root)
+      iex> GenTree.get_left(root)
 
   """
   def get_left(node_pid), do: GenTree.Node.get_left(node_pid)
 
   @spec get_right(pid ) :: pid
   @doc """
-  Get the right child of node
+  Get the right child of node in case of binary tree [:nary, 2]
 
   ## Examples
       iex> root = GenTree.new(5)
-      iex> right_child = GenTree.get_right(root)
+      iex> GenTree.get_right(root)
 
   """
   def get_right(node_pid), do: GenTree.Node.get_right(node_pid)
 
-  @spec left?(pid ) :: boolean()
+  @spec get_children(pid) :: [pid]
   @doc """
-  Return if data has a left child
+  Get the children list of the node
+
+  """
+  def get_children(node_pid), do: GenTree.Node.get_children(node_pid)
+
+  @spec count_children(pid) :: number()
+  @doc """
+  Counts the number of children of the node
+
+  ## Examples
+      iex> root = GenTree.new(5)
+      iex> GenTree.count_children(root)
+      0
+      iex> GenTree.insert_child(root, "b", :left)
+      iex> GenTree.insert_child(root, "a", :right)
+      iex> GenTree.count_children(root)
+      2
+
+  """
+  def count_children(node_pid), do: GenTree.Node.count_children(node_pid)
+
+  @spec has_left?(pid) :: boolean()
+  @doc """
+  Return if data has a left child in case of binary tree [:nary, 2]
 
    ## Examples
       iex> root = GenTree.new(5)
-      iex> GenTree.left?(root)
+      iex> GenTree.has_left?(root)
       false
 
   """
-  def left?(node_pid), do: GenTree.Node.left?(node_pid)
+  def has_left?(node_pid), do: GenTree.Node.has_left?(node_pid)
 
-  @spec right?(pid ) :: boolean()
+  @spec has_right?(pid ) :: boolean()
   @doc """
-  Return if data has a right child
+  Return if data has a right child in case of binary tree [:nary, 2]
 
    ## Examples
       iex> root = GenTree.new(5)
-      iex> GenTree.right?(root)
+      iex> GenTree.has_right?(root)
       false
 
   """
-  def right?(node_pid), do: GenTree.Node.right?(node_pid)
+  def has_right?(node_pid), do: GenTree.Node.has_right?(node_pid)
 
   @spec update_data(pid , any) :: :ok
   @doc """
@@ -115,23 +155,15 @@ defmodule GenTree do
   def insert_child(node_pid, data, child_type \\ :nil), do: GenTree.Node.insert_child(node_pid, data, child_type)
 
   @doc """
-  Builds a Binary tree from a list of data
-
-  ## Examples
-
-      iex(85)> root = GenTree.build_tree([1,2,3,4,5])
-      iex(86)> rl = GenTree.get_left(root)
-      iex(87)> rlr = GenTree.get_right(rl)
-      iex(87)> GenTree.get_data(rlr)
-      5
-
+  Builds a tree from a datalist in level-order. Data can have ```nil``` to skip sub-tree.
   """
-  def build_tree(data_list), do: GenTree.Builder.build_tree_level_order(data_list)
+  def from_list(data_list, opts \\ [nary: 2]), do: GenTree.Builder.from_list(data_list, opts)
 
-  @spec dfs(pid, :inorder | :postorder | :preorder ) :: [any]
+  @spec dfs(pid, :inorder | :preorder | :postorder) :: [any]
   @doc """
 
   Traverses a binary tree using DFS.
+
   Traversal types
     * :inorder
     * :preorder
@@ -139,7 +171,7 @@ defmodule GenTree do
 
   ## Examples
 
-      iex> root = GenTree.build_tree([1,2,3,4,5,6])
+      iex> root = GenTree.from_list([1,2,3,4,5,6])
       iex> GenTree.Traversal.dfs(root, :inorder)
       [4, 2, 5, 1, 6, 3]
       iex> GenTree.Traversal.dfs(root, :preorder)
@@ -152,11 +184,11 @@ defmodule GenTree do
 
   @spec bfs(pid) :: [any]
   @doc """
-  Traverses a binary tree using BFS.
+  Traverses a tree using BFS.
 
   ## Examples
 
-      iex> root = GenTree.build_tree([1,2,3,4,5,6])
+      iex> root = GenTree.from_list([1,2,3,4,5,6])
       iex> GenTree.Traversal.bfs(root)
       [1, 2, 3, 4, 5, 6]
 
