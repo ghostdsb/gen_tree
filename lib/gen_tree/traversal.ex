@@ -84,16 +84,10 @@ defmodule GenTree.Traversal do
         Agent.update(agent_pid, fn traversal_data -> traversal_data ++ [node_data] end)
 
         queue =
-          case node_pid |> GenTree.Node.get_left() do
-            :nil -> queue
-            left_node -> :queue.in(left_node, queue)
-          end
-
-        queue =
-          case node_pid |> GenTree.Node.get_right() do
-            :nil -> queue
-            right_node -> :queue.in(right_node, queue)
-          end
+          node_pid
+          |> GenTree.get_children()
+          |> Enum.reverse()
+          |> Enum.reduce(queue, fn child_pid, queue -> :queue.in(child_pid, queue) end)
 
         bfs(queue, agent_pid)
     end

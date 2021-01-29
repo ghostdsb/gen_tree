@@ -1,6 +1,24 @@
 # GenTree
 
-Tree data structure for BEAM in BEAM-way. Each node is a process that contains data and children_pids (just like using pointers).
+Tree data structure for BEAM in BEAM-way. Each node is a process that contains data and children_pids. The pid is used as pointers.
+
+Tree implementation becomes straight forwards with pointers that can point to a node and a shared state that helps in while performing operations on different nodes, say traversals.
+A work around this would be using ```Agents```.
+
+    Agents are a simple abstraction around state.
+
+    Often in Elixir there is a need to share or store state that must be accessed
+    from different processes or by the same process at different points in time.
+
+    The Agent module provides a basic server implementation that allows state to be
+    retrieved and updated via a simple API.
+
+Thus a node in tree can be described as
+
+  ```elixir
+  {:ok, node_pid} = Agent.start(fn -> %{data: "some_data"} end)
+  ```
+This provides us with a pid which can be used to point to the node and a state that can be manipulated.
 
 1. Start a new tree
     ```elixir
@@ -39,7 +57,7 @@ Tree data structure for BEAM in BEAM-way. Each node is a process that contains d
       left: #PID<0.216.0>,
       right: #PID<0.221.0>
     }
-    iex> GenTree.left?(root)
+    iex> GenTree.has_left?(root)
     true
     ```
 
@@ -66,7 +84,7 @@ Tree data structure for BEAM in BEAM-way. Each node is a process that contains d
     %GenTree.Node{children: [], data: "b", left: nil, right: nil}
     ```
 
-6. Building a binary tree from input data list
+6. Builds a tree from a datalist in level-order. Data can have ```nil``` to skip sub-tree.
     ```elixir
     iex> root = GenTree.build_tree([1,2,3,4,5])
     #PID<0.398.0>
@@ -94,7 +112,7 @@ Tree data structure for BEAM in BEAM-way. Each node is a process that contains d
     ```elixir
     iex> root = GenTree.build_tree([1,2,3,4,5,6])
     #PID<0.378.0>
-    iex> GenTree.Traversal.dfs(root)
+    iex> GenTree.Traversal.dfs(root, :inorder)
     [4, 2, 5, 1, 6, 3]
     iex> GenTree.Traversal.dfs(root, :preorder)
     [1, 2, 4, 5, 3, 6]
