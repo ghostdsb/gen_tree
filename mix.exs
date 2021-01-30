@@ -4,7 +4,7 @@ defmodule GenTree.MixProject do
   def project do
     [
       app: :gen_tree,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.10",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env() == :prod,

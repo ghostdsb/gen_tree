@@ -5,6 +5,7 @@ defmodule GenTree.Node do
     data: nil,
     left: nil,
     right: nil,
+    parent: nil,
     children: []
   )
 
@@ -15,6 +16,14 @@ defmodule GenTree.Node do
 
   def get_data(node_pid) do
     Agent.get(node_pid, fn state -> state.data end)
+  end
+
+  def set_parent(self_pid, parent_pid) do
+    Agent.update(self_pid, fn state -> %{state | parent: parent_pid} end)
+  end
+
+  def get_parent(node_pid) do
+    Agent.get(node_pid, fn state -> state.parent end)
   end
 
   def get_children(node_pid) do
@@ -46,7 +55,7 @@ defmodule GenTree.Node do
   end
 
   def update_data(node_pid, data) do
-    Agent.get(node_pid, fn state -> %{state | data: data} end)
+    Agent.update(node_pid, fn state -> %{state | data: data} end)
   end
 
   def update_node(node_pid, new_state) do
@@ -55,6 +64,7 @@ defmodule GenTree.Node do
 
   def insert_child(parent_node_pid, data, child_type) do
     child_node_pid = new(data)
+    set_parent(child_node_pid, parent_node_pid)
     case child_type do
       :left ->
         Agent.update(parent_node_pid, fn state -> %{state | children: [child_node_pid | state.children], left: child_node_pid} end)
