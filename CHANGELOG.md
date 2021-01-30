@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.2.1
+
+* Added parent attribute to node
+* Added get_parent/1 and set_parent/2
+* Improved tree traversal methods
+* Added reducer function
+
 ## v0.2.0
 
 * Renamed build_tree/2 to from_list/2

@@ -42,7 +42,7 @@ defmodule GenTree do
 
       iex> root = GenTree.new(5)
       iex> root |> GenTree.get_node()
-      %GenTree.Node{children: [], data: 5, left: nil, right: nil}
+      %GenTree.Node{children: [], data: 5, left: nil, right: nil, parent: nil}
 
   """
   def get_node(node_pid), do: GenTree.Node.get_node(node_pid)
@@ -60,7 +60,7 @@ defmodule GenTree do
   """
   def get_data(node_pid), do: GenTree.Node.get_data(node_pid)
 
-  @spec get_left(pid) :: pid
+  @spec get_left(pid) :: pid | nil
   @doc """
   Get the left child of node in case of binary tree [:nary, 2]
 
@@ -71,7 +71,7 @@ defmodule GenTree do
   """
   def get_left(node_pid), do: GenTree.Node.get_left(node_pid)
 
-  @spec get_right(pid ) :: pid
+  @spec get_right(pid ) :: pid | nil
   @doc """
   Get the right child of node in case of binary tree [:nary, 2]
 
@@ -141,6 +141,18 @@ defmodule GenTree do
   """
   def update_node(node_pid, data), do: GenTree.Node.update_node(node_pid, data)
 
+  @spec set_parent(pid , pid) :: :ok
+  @doc """
+  Updates the parent pid of node.
+  """
+  def set_parent(self_pid, parent_pid), do: GenTree.Node.set_parent(self_pid, parent_pid)
+
+  @spec get_parent(pid) :: pid
+  @doc """
+  Updates the parent pid of node.
+  """
+  def get_parent(self_pid), do: GenTree.Node.get_parent(self_pid)
+
   @doc """
   Inserts child to the node and returns the child pid.
   child_type can be :left, :right or omitted.
@@ -149,8 +161,8 @@ defmodule GenTree do
 
       iex(21)> root = GenTree.new("a")
       iex(23)> left_child = GenTree.insert_child(root, "b", :left)
-      iex(25)> GenTree.get_node(left_child)
-      %GenTree.Node{children: [], data: "b", left: nil, right: nil}
+      iex(25)> GenTree.get_parent(left_child) === root
+      true
   """
   def insert_child(node_pid, data, child_type \\ :nil), do: GenTree.Node.insert_child(node_pid, data, child_type)
 
@@ -195,5 +207,39 @@ defmodule GenTree do
   """
   def bfs(parent_pid), do: GenTree.Traversal.bfs(parent_pid)
 
+  @spec reduce(pid, any, (any(), any() -> any()), keyword) :: any
+  @doc """
+  Invokes reducer_function for each node_pid in the tree with the accumulator.
+
+  Default tree traversal method is Breadth-First-Search and default order of Depth First Search is postorder. Traversal options can be passed as Keyword list as
+
+        [
+            search: :bfs | :dfs,
+            order: :postorder, :preorder, :inorder
+        ]
+
+  ## Examples
+
+      iex> root = GenTree.from_list([1,2,3,nil,4,5,7,nil,nil,8,9])
+      iex> GenTree.reduce(root, 0, fn node_pid, acc -> acc + GenTree.get_data(node_pid) end)
+      39
+      iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [GenTree.get_data(node_pid)] end, [search: :dfs, order: :postorder])
+      [4, 2, 8, 9, 5, 7, 3, 1]
+      iex> GenTree.dfs(root, :postorder)
+      [4, 2, 8, 9, 5, 7, 3, 1]
+      iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [node_pid] end, [search: :dfs, order: :postorder]) |>
+      ...> Enum.map(fn node_pid -> GenTree.get_data(node_pid) end)
+      [4, 2, 8, 9, 5, 7, 3, 1]
+
+  """
+  def reduce(root_pid, initial_value, reducer_function, traverse_opts \\ [search: :bfs]) do
+    search_method = Keyword.get(traverse_opts, :search)
+    order =  Keyword.get(traverse_opts, :order, :postorder)
+
+    case search_method do
+        :bfs -> GenTree.Traversal.bfs(root_pid, initial_value, reducer_function)
+        :dfs -> GenTree.Traversal.dfs(root_pid, order, initial_value, reducer_function)
+    end
+  end
 
 end
