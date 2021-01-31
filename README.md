@@ -133,17 +133,17 @@ This provides us with a pid which can be used to point to the node and a state t
 
 9. Reducer Function: Invokes reducer_function for each node_pid in the tree with the accumulator.
   ```elixir
-      iex> root = GenTree.from_list([1,2,3,nil,4,5,7,nil,nil,8,9])
-      iex> GenTree.reduce(root, 0, fn node_pid, acc -> acc + GenTree.get_data(node_pid) end)
-      39
-      iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [GenTree.get_data(node_pid)] end, [search: :dfs, order: :postorder])
-      [4, 2, 8, 9, 5, 7, 3, 1]
-      iex> GenTree.dfs(root, :postorder)
-      [4, 2, 8, 9, 5, 7, 3, 1]
-      iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [node_pid] end, [search: :dfs, order: :postorder]) |>
-      ...> Enum.map(fn node_pid -> GenTree.get_data(node_pid) end)
-      [4, 2, 8, 9, 5, 7, 3, 1]
-      iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [node_pid] end, [search: :dfs, order: :postorder])
-      [#PID<0.209.0>, #PID<0.207.0>, #PID<0.212.0>, #PID<0.213.0>, #PID<0.210.0>,
-      #PID<0.211.0>, #PID<0.208.0>, #PID<0.206.0>]
+  iex> root = GenTree.from_list([1,2,3,nil,4,5,7,nil,nil,8,9])
+  iex> GenTree.reduce(root, 0, fn node_pid, acc -> acc + GenTree.get_data(node_pid) end)
+  39
+  iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [GenTree.get_data(node_pid)] end, [search: :dfs, order: :postorder])
+  [4, 2, 8, 9, 5, 7, 3, 1]
+  iex> GenTree.dfs(root, :postorder)
+  [4, 2, 8, 9, 5, 7, 3, 1]
+  iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [node_pid] end, [search: :dfs, order: :postorder]) |>
+  ...> Enum.map(fn node_pid -> GenTree.get_data(node_pid) end)
+  [4, 2, 8, 9, 5, 7, 3, 1]
+  iex> GenTree.reduce(root, [], fn node_pid, acc -> acc ++ [node_pid] end, [search: :dfs, order: :postorder])
+  [#PID<0.209.0>, #PID<0.207.0>, #PID<0.212.0>, #PID<0.213.0>, #PID<0.210.0>,
+  #PID<0.211.0>, #PID<0.208.0>, #PID<0.206.0>]
   ```
