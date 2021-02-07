@@ -4,7 +4,7 @@ defmodule GenTree.MixProject do
   def project do
     [
       app: :gen_tree,
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: "~> 1.10",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env() == :prod,
@@ -32,14 +32,17 @@ defmodule GenTree.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger,:wobserver],
+      applications: [:wobserver]
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:ex_doc, "~> 0.18", only: :dev}
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:wobserver, "~> 0.1"},
+      {:plug_cowboy, "~> 1.0"}
     ]
   end
 end
