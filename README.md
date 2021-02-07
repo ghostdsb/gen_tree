@@ -18,6 +18,9 @@ Thus a node in tree can be described as
   ```elixir
   {:ok, node_pid} = Agent.start(fn -> %{data: "some_data"} end)
   ```
+
+!(gentree)[./assets/GenTree.png]
+
 This provides us with a pid which can be used to point to the node and a state that can be manipulated.
 
 1. Start a new tree

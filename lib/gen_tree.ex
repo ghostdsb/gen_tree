@@ -19,6 +19,9 @@ defmodule GenTree do
     {:ok, node_pid} = Agent.start(fn -> %{data: "some_data"} end)
     ```
     This provides us with a pid which can be used to point to the node and a state that can be manipulated.
+
+    ![gentree](GenTree.png)
+
     """
 
   @spec new(any) :: pid
