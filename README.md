@@ -19,7 +19,7 @@ Thus a node in tree can be described as
   {:ok, node_pid} = Agent.start(fn -> %{data: "some_data"} end)
   ```
 
-!(gentree)[./assets/GenTree.png]
+![gentree](./assets/GenTree.png)
 
 This provides us with a pid which can be used to point to the node and a state that can be manipulated.
 
