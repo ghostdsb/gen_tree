@@ -169,6 +169,7 @@ defmodule GenTree do
   """
   def insert_child(node_pid, data, child_type \\ :nil), do: GenTree.Node.insert_child(node_pid, data, child_type)
 
+  @spec from_list(list, keyword()) :: pid
   @doc """
   Builds a tree from a datalist in level-order. Data can have ```nil``` to skip sub-tree.
   """
